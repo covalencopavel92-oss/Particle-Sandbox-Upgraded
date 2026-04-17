@@ -8,6 +8,17 @@ window.addEventListener('load', () => {
                 if (el) el.addEventListener(event, handler, options);
             }
 
+            function escapeHTML(str) {
+                if (typeof str !== 'string') return str;
+                return str.replace(/[&<>"']/g, (m) => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#039;'
+                })[m]);
+            }
+
             let engine = null;
             let activeTab = '3d';
             let isLightMode = false;
@@ -662,7 +673,7 @@ window.addEventListener('load', () => {
                 if (!codeOutput) return;
 
                 if (currentExportMode === 'full') {
-                    const cfgExport = JSON.stringify(configs[activeTab], null, 4);
+                    const cfgExport = JSON.stringify(configs[activeTab], null, 4).replace(/</g, '\\u003c');
                     const exportStr = `<!-- WebGL Particle Engine V16.2 Drop-in -->
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Audiowide&family=Bebas+Neue&family=Cinzel:wght@900&family=Inter:wght@100;400;900&family=Manrope:wght@800&family=Montserrat:wght@900&family=Orbitron:wght@900&family=Outfit:wght@900&family=Playfair+Display:wght@900&family=Poppins:wght@900&family=Rajdhani:wght@700&family=Righteous&family=Roboto:wght@900&family=Space+Grotesk:wght@700&family=Syne:wght@800&family=Syncopate:wght@700&family=VT323&family=Plus+Jakarta+Sans:wght@800&family=Clash+Display:wght@700&family=Cabinet+Grotesk:wght@800&family=Anton&family=Bungee+Shade&family=Monoton&family=Rampart+One&family=Tourney:wght@900&family=Rubik+Glitch&family=Silkscreen&family=Bangers&family=Creepster&family=Press+Start+2P&display=swap');
@@ -683,8 +694,11 @@ body.light-theme #webgl-bg { background-color: #f1f5f9; }
 <\/script>`;
                     codeOutput.value = exportStr;
                 } else {
-                    let name = shapeNameInput.value.trim() || "My Custom Shape";
-                    let id = name.toLowerCase().replace(/[^a-z0-9]/g, '_');
+                    let rawName = shapeNameInput.value.trim() || "My Custom Shape";
+                    let name = escapeHTML(rawName);
+                    // Also escape for JS comments to prevent breakout
+                    let safeNameForComment = name.replace(/\*\//g, '* /');
+                    let id = rawName.toLowerCase().replace(/[^a-z0-9]/g, '_');
                     if (!id) id = 'custom_shape_' + Date.now().toString().slice(-4);
                     if (!id.startsWith('3d_')) id = '3d_custom_' + id;
 
@@ -694,7 +708,7 @@ body.light-theme #webgl-bg { background-color: #f1f5f9; }
                     const p3 = configs['3d'].customParam3;
                     const p4 = configs['3d'].customParam4;
 
-                    codeOutput.value = `<!-- SHAPE SNIPPET FOR: ${name} -->\n\n/* \nTo permanently add "${name}" to your particle engine's source code,\nfollow these two steps in your index.html file:\n*/\n\n/* STEP 1: Add this HTML to the shapeOptions['3d'] string (around line 1115) */\n<option value="${id}">⭐ ${name}</option>\n\n/* STEP 2: Add this JS to the get3DGeometry(shape) function inside the else-if chain (around line 1250) */\nelse if (shape === '${id}') {\n    geo = this.createParametricGeometry('${type}', ${p1}, ${p2}, ${p3}, ${p4}, r);\n}`;
+                    codeOutput.value = `<!-- SHAPE SNIPPET FOR: ${name} -->\n\n/* \nTo permanently add "${safeNameForComment}" to your particle engine's source code,\nfollow these two steps in your index.html file:\n*/\n\n/* STEP 1: Add this HTML to the shapeOptions['3d'] string (around line 1115) */\n<option value="${id}">⭐ ${name}</option>\n\n/* STEP 2: Add this JS to the get3DGeometry(shape) function inside the else-if chain (around line 1250) */\nelse if (shape === '${id}') {\n    geo = this.createParametricGeometry('${type}', ${p1}, ${p2}, ${p3}, ${p4}, r);\n}`;
                 }
             };
 
