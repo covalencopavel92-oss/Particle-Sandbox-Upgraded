@@ -1,4 +1,5 @@
 import { WebGLParticleSandbox, createDefaultImageDataUrl } from './engine.js';
+import { fetchWithRetry } from './utils.js';
 
 const GEMINI_API_KEY = "";
 
@@ -711,19 +712,6 @@ body.light-theme #webgl-bg { background-color: #f1f5f9; }
             });
 
             // GEMINI AI INTEGRATION ==================================
-            async function fetchWithRetry(url, options, retries = 5) {
-                const delays = [1000, 2000, 4000, 8000, 16000];
-                for (let i = 0; i < retries; i++) {
-                    try {
-                        const response = await fetch(url, options);
-                        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                        return await response.json();
-                    } catch (e) {
-                        if (i === retries - 1) throw e;
-                        await new Promise(res => setTimeout(res, delays[i]));
-                    }
-                }
-            }
 
             const aiBtn = document.getElementById('aiGenerateBtn');
             const aiInput = document.getElementById('aiPromptInput');
