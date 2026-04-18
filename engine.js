@@ -638,6 +638,7 @@ export class WebGLParticleSandbox {
             applyColors() {
                 const count = this.config.count;
                 const cObj = new THREE.Color();
+                const tempColor = new THREE.Color();
 
                 const isCustom = this.config.theme.startsWith('custom_');
                 const isSolid = this.config.theme === 'custom_solid';
@@ -922,6 +923,7 @@ export class WebGLParticleSandbox {
                 const finalScale = fitScale * (this.config.fontSize / 100);
 
                 const cObj = new THREE.Color();
+                const tempColor = new THREE.Color();
                 const palette = this.palettes[this.config.theme];
                 const isCustom = this.config.theme.startsWith('custom_');
                 const isSolid = this.config.theme === 'custom_solid';
@@ -1006,6 +1008,7 @@ export class WebGLParticleSandbox {
                     const finalScale = fitScale * (this.config.imageScale / 100);
 
                     const cObj = new THREE.Color();
+                    const tempColor = new THREE.Color();
                     const palette = this.palettes[this.config.theme];
                     const isCustom = this.config.theme.startsWith('custom_');
                     const isSolid = this.config.theme === 'custom_solid';
@@ -1164,6 +1167,7 @@ export class WebGLParticleSandbox {
                 const scale = targetSize / maxDim;
 
                 const cObj = new THREE.Color();
+                const tempColor = new THREE.Color();
                 const palette = this.palettes[this.config.theme];
                 const isCustom = this.config.theme.startsWith('custom_');
                 const isSolid = this.config.theme === 'custom_solid';
