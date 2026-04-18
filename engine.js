@@ -130,6 +130,11 @@ export class WebGLParticleSandbox {
                 this.bgPoints = null;
                 this.bgPlane = null;
 
+                // Pre-allocated objects for performance optimization in the render loop
+                this._reusableVector = new THREE.Vector3();
+                this._reusableColor = new THREE.Color();
+                this._reusableObject3D = new THREE.Object3D();
+
                 this.init();
             }
 
@@ -1232,9 +1237,8 @@ export class WebGLParticleSandbox {
                     const ndcY = -(clientY / window.innerHeight) * 2 + 1;
                     this.raycaster.setFromCamera({x: ndcX, y: ndcY}, this.camera);
 
-                    const pt = new THREE.Vector3();
-                    if (this.raycaster.ray.intersectPlane(this.plane, pt)) {
-                        targetVec.copy(pt);
+                    if (this.raycaster.ray.intersectPlane(this.plane, this._reusableVector)) {
+                        targetVec.copy(this._reusableVector);
                     } else {
                         targetVec.set(-9999, -9999, 0);
                     }
@@ -1349,16 +1353,16 @@ export class WebGLParticleSandbox {
 
                 let mx = -9999, my = -9999, mz = -9999;
                 if (this.mouseTarget.x !== -9999) {
-                    const lMouse = this.mouseTarget.clone();
-                    this.scene.worldToLocal(lMouse);
-                    mx = lMouse.x; my = lMouse.y; mz = lMouse.z;
+                    this._reusableVector.copy(this.mouseTarget);
+                    this.scene.worldToLocal(this._reusableVector);
+                    mx = this._reusableVector.x; my = this._reusableVector.y; mz = this._reusableVector.z;
                 }
 
                 let cx = -9999, cy = -9999, cz = -9999;
                 if (this.clickPos.x !== -9999) {
-                    const lClick = this.clickPos.clone();
-                    this.scene.worldToLocal(lClick);
-                    cx = lClick.x; cy = lClick.y; cz = lClick.z;
+                    this._reusableVector.copy(this.clickPos);
+                    this.scene.worldToLocal(this._reusableVector);
+                    cx = this._reusableVector.x; cy = this._reusableVector.y; cz = this._reusableVector.z;
                 }
 
                 const interactionRadius = this.config.mouseRadius;
@@ -1366,7 +1370,7 @@ export class WebGLParticleSandbox {
 
                 const depthScale = this.config.globalDepth;
                 const friction = this.config.friction;
-                const dummy = is3D ? new THREE.Object3D() : null;
+                const dummy = is3D ? this._reusableObject3D : null;
                 const pScale = this.config.size / 5.0;
 
                 const maxVel = 50 * Math.max(1, speed);
@@ -1548,7 +1552,10 @@ export class WebGLParticleSandbox {
                             else if (hAction === 'trail') { vx += dx*0.01*speed; vy += dy*0.01*speed; vz += dz*0.01*speed; }
                             else if (hAction === 'paint') {
                                 this.colors[i3]=1; this.colors[i3+1]=1; this.colors[i3+2]=1; colorNeedsPush=true;
-                                if(this.instancedMesh) this.instancedMesh.setColorAt(i, new THREE.Color(1,1,1));
+                                if(this.instancedMesh) {
+                                    this._reusableColor.setRGB(1, 1, 1);
+                                    this.instancedMesh.setColorAt(i, this._reusableColor);
+                                }
                             }
                             else if (hAction === 'magnify') { vz += f*5*speed; }
                             else if (hAction === 'freeze') { vx*=0.1; vy*=0.1; vz*=0.1; }
@@ -1572,9 +1579,9 @@ export class WebGLParticleSandbox {
                         else if (cAction === 'shatter' && cdist < clickRad) { vx += (Math.random()-0.5)*80; vy += (Math.random()-0.5)*80; vz += (Math.random()-0.5)*80; }
                         else if (cAction === 'teleport' && cdist < clickRad) { px=cx+(Math.random()-0.5)*100; py=cy+(Math.random()-0.5)*100; }
                         else if (cAction === 'color_splash' && cdist < clickRad) {
-                            const rC = new THREE.Color().setHSL(Math.random(), 1, 0.5);
-                            this.colors[i3]=rC.r; this.colors[i3+1]=rC.g; this.colors[i3+2]=rC.b; colorNeedsPush=true;
-                            if(this.instancedMesh) this.instancedMesh.setColorAt(i, rC);
+                            this._reusableColor.setHSL(Math.random(), 1, 0.5);
+                            this.colors[i3]=this._reusableColor.r; this.colors[i3+1]=this._reusableColor.g; this.colors[i3+2]=this._reusableColor.b; colorNeedsPush=true;
+                            if(this.instancedMesh) this.instancedMesh.setColorAt(i, this._reusableColor);
                         }
                         else if (cAction === 'gravity_slam' && cdist < clickRad) { vy-=60; }
                         else if (cAction === 'time_freeze' && cdist < clickRad*1.2) { vx=0; vy=0; vz=0; }
