@@ -1,6 +1,6 @@
 import { test, mock, beforeEach, afterEach } from 'node:test';
 import assert from 'node:assert';
-import { fetchWithRetry } from './utils.js';
+import { fetchWithRetry, createDefaultImageDataUrl } from './utils.js';
 
 let originalFetch;
 let originalSetTimeout;
@@ -103,4 +103,49 @@ test('fetchWithRetry handles more than 5 retries by capping delay', async () => 
     );
 
     assert.strictEqual(fetchMock.mock.callCount(), 7);
+});
+
+test('createDefaultImageDataUrl creates canvas and returns data URL', () => {
+    const mockContext = {
+        createLinearGradient: mock.fn(() => ({
+            addColorStop: mock.fn()
+        })),
+        beginPath: mock.fn(),
+        arc: mock.fn(),
+        fill: mock.fn(),
+        fillText: mock.fn()
+    };
+
+    const mockCanvas = {
+        getContext: mock.fn(() => mockContext),
+        toDataURL: mock.fn(() => 'data:image/png;base64,mocked')
+    };
+
+    global.document = {
+        createElement: mock.fn((tag) => {
+            if (tag === 'canvas') return mockCanvas;
+            return {};
+        })
+    };
+
+    const result = createDefaultImageDataUrl();
+
+    assert.strictEqual(global.document.createElement.mock.callCount(), 1);
+    assert.strictEqual(global.document.createElement.mock.calls[0].arguments[0], 'canvas');
+
+    assert.strictEqual(mockCanvas.width, 200);
+    assert.strictEqual(mockCanvas.height, 200);
+
+    assert.strictEqual(mockCanvas.getContext.mock.callCount(), 1);
+    assert.strictEqual(mockCanvas.getContext.mock.calls[0].arguments[0], '2d');
+
+    assert.strictEqual(mockContext.createLinearGradient.mock.callCount(), 1);
+    assert.strictEqual(mockContext.beginPath.mock.callCount(), 1);
+    assert.strictEqual(mockContext.arc.mock.callCount(), 1);
+    assert.strictEqual(mockContext.fill.mock.callCount(), 1);
+    assert.strictEqual(mockContext.fillText.mock.callCount(), 1);
+
+    assert.strictEqual(mockCanvas.toDataURL.mock.callCount(), 1);
+    assert.strictEqual(result, 'data:image/png;base64,mocked');
+    delete global.document;
 });
