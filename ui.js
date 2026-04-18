@@ -119,6 +119,10 @@ window.addEventListener('DOMContentLoaded', () => {
             });
 
             const tab2D = document.getElementById('tab2D');
+            const codeModal = document.getElementById('codeModal');
+            const codeOutput = document.getElementById('codeOutput');
+            const customParticleImageContainer = document.getElementById('customParticleImageContainer');
+
             const tab3D = document.getElementById('tab3D');
             const modeFree = document.getElementById('modeFree');
             const modeText = document.getElementById('modeText');
@@ -342,13 +346,13 @@ window.addEventListener('DOMContentLoaded', () => {
                             // Reset visibility for standard params first to prevent trapped states
                             lbl3.parentElement.parentElement.classList.remove('hidden');
                             lbl4.parentElement.parentElement.classList.remove('hidden');
-                            document.getElementById('customParticleImageContainer').classList.add('hidden');
+                            customParticleImageContainer.classList.add('hidden');
 
                             if (type === 'image_extrusion') {
                                 lbl1.innerText = 'Extrusion Depth'; lbl2.innerText = 'Voxel Res (Quality)';
                                 lbl3.parentElement.parentElement.classList.add('hidden');
                                 lbl4.parentElement.parentElement.classList.add('hidden');
-                                document.getElementById('customParticleImageContainer').classList.remove('hidden');
+                                customParticleImageContainer.classList.remove('hidden');
                             } else if (type === 'torus_knot' || type === '3d_torusknot') {
                                 lbl1.innerText = 'Radius / Detail'; lbl2.innerText = 'Tube Thick'; lbl3.innerText = 'P-Windings'; lbl4.innerText = 'Q-Windings';
                             } else if (type === 'flower') {
@@ -687,7 +691,7 @@ window.addEventListener('DOMContentLoaded', () => {
             safeAddListener(exportModeShape, 'click', () => setExportMode('shape'));
 
             const updateExportText = () => {
-                const codeOutput = document.getElementById('codeOutput');
+
                 if (!codeOutput) return;
 
                 if (currentExportMode === 'full') {
@@ -732,13 +736,13 @@ body.light-theme #webgl-bg { background-color: #f1f5f9; }
 
             safeAddListener(exportBtn, 'click', () => {
                 setExportMode('full');
-                const codeModal = document.getElementById('codeModal');
+
                 if (codeModal) codeModal.classList.replace('modal-enter', 'modal-active');
             });
 
             safeAddListener(exportCustomShapeBtn, 'click', () => {
                 setExportMode('shape');
-                const codeModal = document.getElementById('codeModal');
+
                 if (codeModal) codeModal.classList.replace('modal-enter', 'modal-active');
             });
 
@@ -834,14 +838,14 @@ Guidelines:
                     if (aiConfig.mouseAction) configs[activeTab].mouseAction = aiConfig.mouseAction;
                     if (aiConfig.clickAction) configs[activeTab].clickAction = aiConfig.clickAction;
 
-                    const tab2DBtn = document.getElementById('tab2D');
-                    const tab3DBtn = document.getElementById('tab3D');
+
+
                     if (activeTab === '2d') {
-                        if(tab2DBtn) tab2DBtn.classList.add('active');
-                        if(tab3DBtn) tab3DBtn.classList.remove('active');
+                        if(tab2D) tab2D.classList.add('active');
+                        if(tab3D) tab3D.classList.remove('active');
                     } else {
-                        if(tab3DBtn) tab3DBtn.classList.add('active');
-                        if(tab2DBtn) tab2DBtn.classList.remove('active');
+                        if(tab3D) tab3D.classList.add('active');
+                        if(tab2D) tab2D.classList.remove('active');
                     }
 
                     populateUIFromConfig();
@@ -863,13 +867,13 @@ Guidelines:
 
             const closeModalBtn = document.getElementById('closeModalBtn');
             safeAddListener(closeModalBtn, 'click', () => {
-                const codeModal = document.getElementById('codeModal');
+
                 if (codeModal) codeModal.classList.replace('modal-active', 'modal-enter');
             });
 
             const copyCodeBtn = document.getElementById('copyCodeBtn');
             safeAddListener(copyCodeBtn, 'click', () => {
-                const codeOutput = document.getElementById('codeOutput');
+
                 if (codeOutput) {
                     codeOutput.select();
                     document.execCommand('copy');
