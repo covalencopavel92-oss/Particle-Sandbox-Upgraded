@@ -116,6 +116,7 @@ export class WebGLParticleSandbox {
                 // Pre-allocated objects for performance optimization in the render loop
                 this._reusableVector = new THREE.Vector3();
                 this._reusableColor = new THREE.Color();
+                this._reusableColorLerp = new THREE.Color();
                 this._reusableObject3D = new THREE.Object3D();
 
                 this.init();
@@ -655,7 +656,8 @@ export class WebGLParticleSandbox {
                         const scaled = ratio * (customColors.length - 1);
                         const idx = Math.floor(scaled);
                         const t = scaled - idx;
-                        cObj.set(customColors[idx]).lerp(tempColor.set(customColors[Math.min(idx+1, customColors.length-1)]), t);
+                        this._reusableColorLerp.set(customColors[Math.min(idx+1, customColors.length-1)]);
+                        cObj.set(customColors[idx]).lerp(this._reusableColorLerp, t);
                     } else if (palette) {
                         cObj.setHex(palette[Math.floor(Math.random() * palette.length)]);
                     } else {
@@ -943,12 +945,14 @@ export class WebGLParticleSandbox {
                         const scaled = ratio * (customColors.length - 1);
                         const idx = Math.floor(scaled);
                         const t = scaled - idx;
-                        cObj.set(customColors[idx]).lerp(tempColor.set(customColors[Math.min(idx+1, customColors.length-1)]), t);
+                        this._reusableColorLerp.set(customColors[Math.min(idx+1, customColors.length-1)]);
+                        cObj.set(customColors[idx]).lerp(this._reusableColorLerp, t);
                     } else if (palette) {
                         const scaled = ratio * (palette.length - 1);
                         const idx = Math.floor(scaled);
                         const t = scaled - idx;
-                        cObj.setHex(palette[idx]).lerp(tempColor.setHex(palette[Math.min(idx+1, palette.length-1)]), t);
+                        this._reusableColorLerp.setHex(palette[Math.min(idx+1, palette.length-1)]);
+                        cObj.setHex(palette[idx]).lerp(this._reusableColorLerp, t);
                     }
 
                     this.colors[i3] = cObj.r; this.colors[i3+1] = cObj.g; this.colors[i3+2] = cObj.b;
@@ -1026,12 +1030,14 @@ export class WebGLParticleSandbox {
                                 const scaled = ratio * (customColors.length - 1);
                                 const idx = Math.floor(scaled);
                                 const t = scaled - idx;
-                                cObj.set(customColors[idx]).lerp(tempColor.set(customColors[Math.min(idx+1, customColors.length-1)]), t);
+                                this._reusableColorLerp.set(customColors[Math.min(idx+1, customColors.length-1)]);
+                                cObj.set(customColors[idx]).lerp(this._reusableColorLerp, t);
                             } else if (palette) {
                                 const scaled = ratio * (palette.length - 1);
                                 const idx = Math.floor(scaled);
                                 const t = scaled - idx;
-                                cObj.setHex(palette[idx]).lerp(tempColor.setHex(palette[Math.min(idx+1, palette.length-1)]), t);
+                                this._reusableColorLerp.setHex(palette[Math.min(idx+1, palette.length-1)]);
+                                cObj.setHex(palette[idx]).lerp(this._reusableColorLerp, t);
                             }
                         } else {
                             cObj.setRGB(p.r, p.g, p.b);
@@ -1187,12 +1193,14 @@ export class WebGLParticleSandbox {
                             const scaled = ratio * (customColors.length - 1);
                             const idx = Math.floor(scaled);
                             const t = scaled - idx;
-                            cObj.set(customColors[idx]).lerp(tempColor.set(customColors[Math.min(idx+1, customColors.length-1)]), t);
+                            this._reusableColorLerp.set(customColors[Math.min(idx+1, customColors.length-1)]);
+                            cObj.set(customColors[idx]).lerp(this._reusableColorLerp, t);
                         } else if (palette) {
                             const scaled = ratio * (palette.length - 1);
                             const idx = Math.floor(scaled);
                             const t = scaled - idx;
-                            cObj.setHex(palette[idx]).lerp(tempColor.setHex(palette[Math.min(idx+1, palette.length-1)]), t);
+                            this._reusableColorLerp.setHex(palette[Math.min(idx+1, palette.length-1)]);
+                            cObj.setHex(palette[idx]).lerp(this._reusableColorLerp, t);
                         }
                     } else {
                         cObj.setRGB(p.r, p.g, p.b);
