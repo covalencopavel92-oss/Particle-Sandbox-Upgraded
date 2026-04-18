@@ -637,6 +637,7 @@ export class WebGLParticleSandbox {
             applyColors() {
                 const count = this.config.count;
                 const cObj = new THREE.Color();
+                const tempColor = new THREE.Color();
 
                 const isCustom = this.config.theme.startsWith('custom_');
                 const isSolid = this.config.theme === 'custom_solid';
@@ -654,7 +655,7 @@ export class WebGLParticleSandbox {
                         const scaled = ratio * (customColors.length - 1);
                         const idx = Math.floor(scaled);
                         const t = scaled - idx;
-                        cObj.set(customColors[idx]).lerp(new THREE.Color(customColors[Math.min(idx+1, customColors.length-1)]), t);
+                        cObj.set(customColors[idx]).lerp(tempColor.set(customColors[Math.min(idx+1, customColors.length-1)]), t);
                     } else if (palette) {
                         cObj.setHex(palette[Math.floor(Math.random() * palette.length)]);
                     } else {
@@ -920,6 +921,7 @@ export class WebGLParticleSandbox {
                 const finalScale = fitScale * (this.config.fontSize / 100);
 
                 const cObj = new THREE.Color();
+                const tempColor = new THREE.Color();
                 const palette = this.palettes[this.config.theme];
                 const isCustom = this.config.theme.startsWith('custom_');
                 const isSolid = this.config.theme === 'custom_solid';
@@ -941,12 +943,12 @@ export class WebGLParticleSandbox {
                         const scaled = ratio * (customColors.length - 1);
                         const idx = Math.floor(scaled);
                         const t = scaled - idx;
-                        cObj.set(customColors[idx]).lerp(new THREE.Color(customColors[Math.min(idx+1, customColors.length-1)]), t);
+                        cObj.set(customColors[idx]).lerp(tempColor.set(customColors[Math.min(idx+1, customColors.length-1)]), t);
                     } else if (palette) {
                         const scaled = ratio * (palette.length - 1);
                         const idx = Math.floor(scaled);
                         const t = scaled - idx;
-                        cObj.setHex(palette[idx]).lerp(new THREE.Color(palette[Math.min(idx+1, palette.length-1)]), t);
+                        cObj.setHex(palette[idx]).lerp(tempColor.setHex(palette[Math.min(idx+1, palette.length-1)]), t);
                     }
 
                     this.colors[i3] = cObj.r; this.colors[i3+1] = cObj.g; this.colors[i3+2] = cObj.b;
@@ -1002,6 +1004,7 @@ export class WebGLParticleSandbox {
                     const finalScale = fitScale * (this.config.imageScale / 100);
 
                     const cObj = new THREE.Color();
+                    const tempColor = new THREE.Color();
                     const palette = this.palettes[this.config.theme];
                     const isCustom = this.config.theme.startsWith('custom_');
                     const isSolid = this.config.theme === 'custom_solid';
@@ -1023,12 +1026,12 @@ export class WebGLParticleSandbox {
                                 const scaled = ratio * (customColors.length - 1);
                                 const idx = Math.floor(scaled);
                                 const t = scaled - idx;
-                                cObj.set(customColors[idx]).lerp(new THREE.Color(customColors[Math.min(idx+1, customColors.length-1)]), t);
+                                cObj.set(customColors[idx]).lerp(tempColor.set(customColors[Math.min(idx+1, customColors.length-1)]), t);
                             } else if (palette) {
                                 const scaled = ratio * (palette.length - 1);
                                 const idx = Math.floor(scaled);
                                 const t = scaled - idx;
-                                cObj.setHex(palette[idx]).lerp(new THREE.Color(palette[Math.min(idx+1, palette.length-1)]), t);
+                                cObj.setHex(palette[idx]).lerp(tempColor.setHex(palette[Math.min(idx+1, palette.length-1)]), t);
                             }
                         } else {
                             cObj.setRGB(p.r, p.g, p.b);
@@ -1158,6 +1161,7 @@ export class WebGLParticleSandbox {
                 const scale = targetSize / maxDim;
 
                 const cObj = new THREE.Color();
+                const tempColor = new THREE.Color();
                 const palette = this.palettes[this.config.theme];
                 const isCustom = this.config.theme.startsWith('custom_');
                 const isSolid = this.config.theme === 'custom_solid';
@@ -1183,12 +1187,12 @@ export class WebGLParticleSandbox {
                             const scaled = ratio * (customColors.length - 1);
                             const idx = Math.floor(scaled);
                             const t = scaled - idx;
-                            cObj.set(customColors[idx]).lerp(new THREE.Color(customColors[Math.min(idx+1, customColors.length-1)]), t);
+                            cObj.set(customColors[idx]).lerp(tempColor.set(customColors[Math.min(idx+1, customColors.length-1)]), t);
                         } else if (palette) {
                             const scaled = ratio * (palette.length - 1);
                             const idx = Math.floor(scaled);
                             const t = scaled - idx;
-                            cObj.setHex(palette[idx]).lerp(new THREE.Color(palette[Math.min(idx+1, palette.length-1)]), t);
+                            cObj.setHex(palette[idx]).lerp(tempColor.setHex(palette[Math.min(idx+1, palette.length-1)]), t);
                         }
                     } else {
                         cObj.setRGB(p.r, p.g, p.b);
