@@ -3,7 +3,7 @@ import { fetchWithRetry } from './utils.js';
 
 const GEMINI_API_KEY = "";
 
-window.addEventListener('load', () => {
+window.addEventListener('DOMContentLoaded', () => {
 
             function safeAddListener(el, event, handler, options) {
                 if (el) el.addEventListener(event, handler, options);
@@ -27,9 +27,7 @@ window.addEventListener('load', () => {
             const configs = {
                 '2d': {
                     morphMode: 'none', shape: 'circle', count: 40000, size: 2.0, speed: 1.0, opacity: 0.9,
-                    theme: 'vaporwave_26', customColors: ['#06b6d4', '#a855f7'], behavior: 'tornado',
-                    mouseAction: 'attract', clickAction: 'shockwave', mouseRadius: 250,
-                    textMorph: 'SUPREME\n2D', fontFamily: "'Space Grotesk', sans-serif",
+
                     theme: 'vaporwave_26', customColors: ['#06b6d4', '#a855f7'], behavior: 'tornado',
                     mouseAction: 'attract', clickAction: 'shockwave', mouseRadius: 250,
                     textMorph: 'SUPREME\n2D', fontFamily: "'Space Grotesk', sans-serif",
@@ -44,9 +42,7 @@ window.addEventListener('load', () => {
                 },
                 '3d': {
                     morphMode: 'none', shape: '3d_cube', count: 10000, size: 4.0, speed: 1.0, opacity: 0.9,
-                    theme: 'cyber_gold', customColors: ['#ffaa00', '#06b6d4'], behavior: 'blackhole',
-                    mouseAction: 'repel', clickAction: 'implode', mouseRadius: 300,
-                    textMorph: 'SUPREME\n3D', fontFamily: "'Inter', sans-serif",
+
                     theme: 'cyber_gold', customColors: ['#ffaa00', '#06b6d4'], behavior: 'blackhole',
                     mouseAction: 'repel', clickAction: 'implode', mouseRadius: 300,
                     textMorph: 'SUPREME\n3D', fontFamily: "'Inter', sans-serif",
@@ -527,6 +523,16 @@ window.addEventListener('load', () => {
                         if (configs[activeTab].morphMode !== 'image') {
                             configs[activeTab].morphMode = 'image';
                         }
+                        // Update UI mode buttons to match programmatic change
+                        if (modeImage) {
+                            modeFree.classList.remove('active');
+                            modeText.classList.remove('active');
+                            modeModel.classList.remove('active');
+                            modeImage.classList.add('active');
+                            textOnlyGroup.classList.add('hidden');
+                            modelOnlyGroup.classList.add('hidden');
+                            imageOnlyGroup.classList.remove('hidden');
+                        }
                         updateConfigFromUI();
                     };
                     reader.readAsDataURL(file);
@@ -542,6 +548,7 @@ window.addEventListener('load', () => {
                         if (configs[activeTab].bgMode === 'none') {
                             configs[activeTab].bgMode = 'image_3d_particles';
                         }
+                        if (bgMode) bgMode.value = configs[activeTab].bgMode;
                         updateConfigFromUI();
                     };
                     reader.readAsDataURL(file);
@@ -556,6 +563,16 @@ window.addEventListener('load', () => {
                         configs[activeTab].modelDataUrl = event.target.result;
                         if (configs[activeTab].morphMode !== 'model') {
                             configs[activeTab].morphMode = 'model';
+                        }
+                        // Update UI mode buttons to match programmatic change
+                        if (modeModel) {
+                            modeFree.classList.remove('active');
+                            modeText.classList.remove('active');
+                            modeImage.classList.remove('active');
+                            modeModel.classList.add('active');
+                            textOnlyGroup.classList.add('hidden');
+                            imageOnlyGroup.classList.add('hidden');
+                            modelOnlyGroup.classList.remove('hidden');
                         }
                         updateConfigFromUI();
                     };
