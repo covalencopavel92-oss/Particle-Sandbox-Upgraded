@@ -1,5 +1,5 @@
-import { WebGLParticleSandbox, createDefaultImageDataUrl } from './engine.js';
-import { fetchWithRetry } from './utils.js';
+import { WebGLParticleSandbox } from './engine.js';
+import { fetchWithRetry, createDefaultImageDataUrl } from './utils.js';
 
 const GEMINI_API_KEY = "";
 

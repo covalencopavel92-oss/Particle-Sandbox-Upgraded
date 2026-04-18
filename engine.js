@@ -1,21 +1,4 @@
-export function createDefaultImageDataUrl() {
-            const c = document.createElement('canvas');
-            c.width = 200; c.height = 200;
-            const ctx = c.getContext('2d');
-            const grad = ctx.createLinearGradient(0,0,200,200);
-            grad.addColorStop(0, '#00f2fe');
-            grad.addColorStop(1, '#4facfe');
-            ctx.fillStyle = grad;
-            ctx.beginPath();
-            ctx.arc(100, 100, 80, 0, Math.PI*2);
-            ctx.fill();
-            ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 50px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('IMG', 100, 100);
-            return c.toDataURL();
-        }
+import { createDefaultImageDataUrl } from './utils.js';
 
 export class WebGLParticleSandbox {
             constructor(containerId) {
