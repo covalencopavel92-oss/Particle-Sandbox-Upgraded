@@ -645,9 +645,12 @@ export class WebGLParticleSandbox {
                 const isSavedImage = this.config.theme === 'saved_image';
                 const customColors = this.config.customColors || ['#ffffff'];
                 const palette = this.palettes[this.config.theme];
+                const isUploadedModelOriginalColor = this.config.shape === 'uploaded_model' && isSavedImage;
 
                 for (let i = 0; i < count; i++) {
-                    if (isSavedImage && this.hasSavedImage && this.savedImageColors && this.savedImageColors.length === count * 3) {
+                    if (isUploadedModelOriginalColor) {
+                        cObj.setHex(0xffffff);
+                    } else if (isSavedImage && this.hasSavedImage && this.savedImageColors && this.savedImageColors.length === count * 3) {
                         cObj.setRGB(this.savedImageColors[i*3], this.savedImageColors[i*3+1], this.savedImageColors[i*3+2]);
                     } else if (isSolid) {
                         cObj.set(customColors[0]);
@@ -678,9 +681,13 @@ export class WebGLParticleSandbox {
                 if (is3D) {
                     if (this.instancedMesh) this.instancedMesh.dispose();
                     const geo = this.get3DGeometry(this.config.shape);
+
+                    const isUploadedModelOriginalColor = this.config.shape === 'uploaded_model' && this.config.theme === 'saved_image' && geo.attributes.color;
+
                     const mat = new THREE.MeshStandardMaterial({
                         color: 0xffffff, roughness: this.isLightMode ? 0.5 : 0.2, metalness: this.isLightMode ? 0.3 : 0.8,
-                        transparent: true, opacity: this.config.opacity
+                        transparent: true, opacity: this.config.opacity,
+                        vertexColors: !!isUploadedModelOriginalColor
                     });
                     this.instancedMesh = new THREE.InstancedMesh(geo, mat, this.config.count);
                     this.instancedMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
@@ -701,8 +708,12 @@ export class WebGLParticleSandbox {
                 const needsRebuild = newConfig.count !== this.config.count;
                 const needsRecolor = needsRebuild || newConfig.theme !== this.config.theme || JSON.stringify(newConfig.customColors) !== JSON.stringify(this.config.customColors);
                 const modeSwitched = newConfig.morphMode !== this.config.morphMode;
-                const shapeSwitched = newConfig.shape !== this.config.shape;
+                let shapeSwitched = newConfig.shape !== this.config.shape;
                 const opacitySwitched = newConfig.opacity !== this.config.opacity;
+
+                if (newConfig.shape === 'uploaded_model' && newConfig.theme !== this.config.theme && (newConfig.theme === 'saved_image' || this.config.theme === 'saved_image')) {
+                    shapeSwitched = true;
+                }
 
                 const textChanged = newConfig.textMorph !== this.config.textMorph ||
                                     newConfig.fontFamily !== this.config.fontFamily ||
@@ -1100,7 +1111,7 @@ export class WebGLParticleSandbox {
                                 cleanGeo.setAttribute('normal', new THREE.BufferAttribute(dummyNormals, 3));
                             }
 
-                            geometriesToMerge.push(cleanGeo);
+                            const vColors = new Float32Array(geom.attributes.position.count * 3);
 
                             for (let i = 0; i < posAttr.count; i++) {
                                 vec3.fromBufferAttribute(posAttr, i);
@@ -1112,12 +1123,19 @@ export class WebGLParticleSandbox {
                                     b = colorAttr.getZ(i);
                                 }
 
+                                vColors[i*3] = r;
+                                vColors[i*3+1] = g;
+                                vColors[i*3+2] = b;
+
                                 validVertices.push({ x: vec3.x, y: vec3.y, z: vec3.z, r, g, b });
 
                                 if (vec3.x < minX) minX = vec3.x; if (vec3.x > maxX) maxX = vec3.x;
                                 if (vec3.y < minY) minY = vec3.y; if (vec3.y > maxY) maxY = vec3.y;
                                 if (vec3.z < minZ) minZ = vec3.z; if (vec3.z > maxZ) maxZ = vec3.z;
                             }
+
+                            cleanGeo.setAttribute('color', new THREE.BufferAttribute(vColors, 3));
+                            geometriesToMerge.push(cleanGeo);
                         }
                     });
 
