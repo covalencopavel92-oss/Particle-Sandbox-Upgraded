@@ -1093,6 +1093,20 @@ export class WebGLParticleSandbox {
                                 matColor = child.material.color;
                             }
 
+                            let textureData = null;
+                            let uvAttr = child.geometry.attributes.uv;
+                            if (child.material && child.material.map && child.material.map.image && uvAttr) {
+                                const img = child.material.map.image;
+                                const canvas = document.createElement('canvas');
+                                canvas.width = img.width || img.naturalWidth || 512;
+                                canvas.height = img.height || img.naturalHeight || 512;
+                                if (canvas.width > 0 && canvas.height > 0) {
+                                    const ctx = canvas.getContext('2d');
+                                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                                    textureData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                                }
+                            }
+
                             child.updateMatrixWorld(true);
                             const matrix = child.matrixWorld;
 
@@ -1117,7 +1131,37 @@ export class WebGLParticleSandbox {
                                 vec3.fromBufferAttribute(posAttr, i);
 
                                 let r = matColor.r, g = matColor.g, b = matColor.b;
-                                if (colorAttr) {
+                                if (textureData && uvAttr) {
+                                    let u = uvAttr.getX(i);
+                                    let v = uvAttr.getY(i);
+                                    // Handle wrap modes (basic repeat)
+                                    u = u - Math.floor(u);
+                                    v = v - Math.floor(v);
+
+                                    // GLTF textures have origin at top-left but WebGL uses bottom-left.
+                                    // If flipY is required, usually v = 1.0 - v is done, but GLTF conventionally keeps it.
+                                    // However, ThreeJS GLTFLoader often sets flipY=false.
+                                    if (child.material.map.flipY) {
+                                        v = 1.0 - v;
+                                    }
+
+                                    let px = Math.floor(u * textureData.width);
+                                    let py = Math.floor(v * textureData.height);
+
+                                    // Handle edge cases where floating point precision causes the index to be exactly the dimension.
+                                    if (px >= textureData.width) px = textureData.width - 1;
+                                    if (py >= textureData.height) py = textureData.height - 1;
+                                    if (px < 0) px = 0;
+                                    if (py < 0) py = 0;
+
+                                    const index = (py * textureData.width + px) * 4;
+
+                                    if (index >= 0 && index < textureData.data.length) {
+                                        r = textureData.data[index] / 255.0;
+                                        g = textureData.data[index+1] / 255.0;
+                                        b = textureData.data[index+2] / 255.0;
+                                    }
+                                } else if (colorAttr) {
                                     r = colorAttr.getX(i);
                                     g = colorAttr.getY(i);
                                     b = colorAttr.getZ(i);
