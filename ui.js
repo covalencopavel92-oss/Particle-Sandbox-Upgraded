@@ -325,7 +325,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 if (activeTab === '3d' && cfg.savedCustomShapes && cfg.savedCustomShapes.length > 0) {
                     let savedGroup = `<optgroup label="Saved Custom Shapes">`;
                     cfg.savedCustomShapes.forEach(s => {
-                        savedGroup += `<option value="${s.id}">⭐ ${s.name}</option>`;
+                        savedGroup += `<option value="${escapeHTML(s.id)}">⭐ ${escapeHTML(s.name)}</option>`;
                     });
                     savedGroup += `</optgroup>`;
                     currentShapeOptions = currentShapeOptions.replace('</optgroup>', '</optgroup>' + savedGroup);
