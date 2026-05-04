@@ -26,7 +26,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
             const configs = {
                 '2d': {
-                    morphMode: 'none', shape: 'circle', count: 40000, size: 2.0, speed: 1.0, opacity: 0.9,
+                    morphMode: 'none', shape: 'circle', particleMaterial: 'standard', count: 40000, size: 2.0, speed: 1.0, opacity: 0.9,
 
                     theme: 'vaporwave_26', customColors: ['#06b6d4', '#a855f7'], behavior: 'tornado',
                     mouseAction: 'attract', clickAction: 'shockwave', mouseRadius: 250,
@@ -41,7 +41,7 @@ window.addEventListener('DOMContentLoaded', () => {
                     customShapeType: 'torus_knot', customParam1: 50, customParam2: 50, customParam3: 50, customParam4: 50
                 },
                 '3d': {
-                    morphMode: 'none', shape: '3d_cube', count: 10000, size: 4.0, speed: 1.0, opacity: 0.9,
+                    morphMode: 'none', shape: '3d_cube', particleMaterial: 'standard', count: 10000, size: 4.0, speed: 1.0, opacity: 0.9,
 
                     theme: 'cyber_gold', customColors: ['#ffaa00', '#06b6d4'], behavior: 'blackhole',
                     mouseAction: 'repel', clickAction: 'implode', mouseRadius: 300,
@@ -140,6 +140,7 @@ window.addEventListener('DOMContentLoaded', () => {
             const colorStops = document.getElementById('colorStops');
             const addColorBtn = document.getElementById('addColorBtn');
             const particleShape = document.getElementById('particleShape');
+            const particleMaterial = document.getElementById('particleMaterial');
             const imageUpload = document.getElementById('imageUpload');
             const modelUpload = document.getElementById('modelUpload');
 
@@ -167,6 +168,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 colorTheme: document.getElementById('colorTheme'),
                 behaviorSelect: document.getElementById('behaviorSelect'),
                 particleShape: particleShape,
+                particleMaterial: particleMaterial,
                 gSpinX: document.getElementById('gSpinX'),
                 gSpinY: document.getElementById('gSpinY'),
                 gSpinZ: document.getElementById('gSpinZ'),
@@ -396,6 +398,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 if (inputs.textString) inputs.textString.value = cfg.textMorph;
                 if (inputs.colorTheme) inputs.colorTheme.value = cfg.theme;
                 if (inputs.particleShape) inputs.particleShape.value = cfg.shape;
+                if (inputs.particleMaterial) inputs.particleMaterial.value = cfg.particleMaterial || 'standard';
                 if (inputs.imageColorMode) inputs.imageColorMode.value = cfg.imageColorMode;
                 if (inputs.modelColorMode) inputs.modelColorMode.value = cfg.modelColorMode;
                 if (inputs.customShapeType) inputs.customShapeType.value = cfg.customShapeType;
@@ -473,6 +476,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 if (inputs.colorTheme) cfg.theme = inputs.colorTheme.value;
                 if (inputs.behaviorSelect) cfg.behavior = cfg.morphMode !== 'none' ? 'morph' : inputs.behaviorSelect.value;
                 if (inputs.particleShape) cfg.shape = inputs.particleShape.value;
+                if (inputs.particleMaterial) cfg.particleMaterial = inputs.particleMaterial.value;
                 if (inputs.gSpinX) cfg.gSpinX = parseFloat(inputs.gSpinX.value);
                 if (inputs.gSpinY) cfg.gSpinY = parseFloat(inputs.gSpinY.value);
                 if (inputs.gSpinZ) cfg.gSpinZ = parseFloat(inputs.gSpinZ.value);
