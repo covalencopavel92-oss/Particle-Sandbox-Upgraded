@@ -15,6 +15,7 @@ export class WebGLParticleSandbox {
                     customColors: ['#ffaa00', '#06b6d4'],
                     behavior: 'blackhole',
                     shape: '3d_cube',
+                    particleMaterial: 'standard',
                     mouseAction: 'repel',
                     clickAction: 'shockwave',
                     mouseRadius: 250,
@@ -684,11 +685,20 @@ export class WebGLParticleSandbox {
 
                     const isUploadedModelOriginalColor = this.config.shape === 'uploaded_model' && this.config.theme === 'saved_image' && geo.attributes.color;
 
-                    const mat = new THREE.MeshStandardMaterial({
-                        color: 0xffffff, roughness: this.isLightMode ? 0.5 : 0.2, metalness: this.isLightMode ? 0.3 : 0.8,
-                        transparent: true, opacity: this.config.opacity,
-                        vertexColors: !!isUploadedModelOriginalColor
-                    });
+                    let mat;
+                    if (this.config.particleMaterial === 'basic') {
+                        mat = new THREE.MeshBasicMaterial({
+                            color: 0xffffff,
+                            transparent: true, opacity: this.config.opacity,
+                            vertexColors: !!isUploadedModelOriginalColor
+                        });
+                    } else {
+                        mat = new THREE.MeshStandardMaterial({
+                            color: 0xffffff, roughness: this.isLightMode ? 0.5 : 0.2, metalness: this.isLightMode ? 0.3 : 0.8,
+                            transparent: true, opacity: this.config.opacity,
+                            vertexColors: !!isUploadedModelOriginalColor
+                        });
+                    }
                     this.instancedMesh = new THREE.InstancedMesh(geo, mat, this.config.count);
                     this.instancedMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
                     this.applyColors();
@@ -709,6 +719,7 @@ export class WebGLParticleSandbox {
                 const needsRecolor = needsRebuild || newConfig.theme !== this.config.theme || JSON.stringify(newConfig.customColors) !== JSON.stringify(this.config.customColors);
                 const modeSwitched = newConfig.morphMode !== this.config.morphMode;
                 let shapeSwitched = newConfig.shape !== this.config.shape;
+                let materialSwitched = newConfig.particleMaterial !== this.config.particleMaterial;
                 const opacitySwitched = newConfig.opacity !== this.config.opacity;
 
                 if (newConfig.shape === 'uploaded_model' && newConfig.theme !== this.config.theme && (newConfig.theme === 'saved_image' || this.config.theme === 'saved_image')) {
@@ -753,7 +764,7 @@ export class WebGLParticleSandbox {
                 if (needsRebuild) {
                     this.buildBuffers();
                 } else {
-                    if (shapeSwitched || customShapeChanged || (newConfig.size !== this.material.size && !newConfig.shape.startsWith('3d_') && newConfig.shape !== 'uploaded_model' && !newConfig.shape.startsWith('custom_') && !newConfig.shape.startsWith('saved_custom_')) || opacitySwitched) {
+                    if (shapeSwitched || customShapeChanged || materialSwitched || (newConfig.size !== this.material.size && !newConfig.shape.startsWith('3d_') && newConfig.shape !== 'uploaded_model' && !newConfig.shape.startsWith('custom_') && !newConfig.shape.startsWith('saved_custom_')) || opacitySwitched) {
                         this.applyShape();
                         if (this.config.morphMode === 'image') this.generateImageTargets();
                         else if (this.config.morphMode === 'text') this.generateTextTargets();
